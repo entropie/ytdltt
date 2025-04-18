@@ -207,6 +207,7 @@ module YTDLTT
 
     def extract_filname_from_ytdlp_out(line)
       [
+        /\[MoveFiles\] Moving file ".*?" to "(.*?)"/,
         /Moving file "(.*?)"/,
         /Destination:\s+(.+)$/,
         /^\/.*\.(mp3|mp4|m4a); file is already in target format/,

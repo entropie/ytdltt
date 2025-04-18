@@ -1,0 +1,9 @@
+#!/usr/bin/env/ruby
+
+require_relative "../lib/ytdltt"
+
+module YTDLTT
+
+  Downloader.loop!
+
+end
