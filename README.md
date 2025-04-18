@@ -11,3 +11,19 @@ The tool automatically handles temp/home paths and supports custom `yt-dlp` para
 - `yt-dlp` in `$PATH`  
 - MQTT broker  
 - Optional: [Trompie](https://github.com/your-org/trompie) library for MQTT + logging integration
+
+
+## Using
+    data = {
+      # Unique sender ID (telegram)
+      "senderid" => 345436757865,
+
+      # Optional yt-dlp arguments
+      "parameters" => ["--no-playlist"],
+
+      # Prefixed URL: A--- for audio, V--- for video
+      "url" => "A---https://www.youtube.com/watch?v=5CLeGECv-1I"
+    }
+
+    ytdl = YTDLTT::YTDLWrapper[data]
+    ytdl.download
