@@ -20,7 +20,7 @@ module YTDLTT
 
   include Trompie
 
-  TOPIC = "test/foo"
+  TOPIC = "yt/dl"
 
   mqtt = MMQTT.new
   # ha = HA.new
@@ -51,8 +51,8 @@ module YTDLTT
         data["url"] = oldurl.split("---").last
       else
         data["url"] = "#{config[:variant] == :audio ? "A" : "V"}---#{oldurl}"
-        return select_from_datasat(data)
-        end
+        return select_from_datasat(data, config)
+      end
       clz = $1 == "A" ? Audio : Video
       clz.new(data, config)
     end
@@ -72,7 +72,7 @@ module YTDLTT
 
     def ytdlp_default_arguments(*args)
       [ '-o %(title).200s.%(ext)s', '--restrict-filenames',
-        '--no-playlist', '--no-post-overwrites', '--no-mtime', '--write-info-json', '--no-write-comments' ] + args
+        '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments' ] + args
     end
 
     def full_arguments
@@ -147,11 +147,11 @@ module YTDLTT
   end
   
   mqtt.subscribe(TOPIC) do |data|
-    # data = {
-    #   "senderid" => 345436757865,
-    #   "parameters"=>["-P /tmp"],
-    #   "url" => "V---https://www.youtube.com/watch?v=5CLeGECv-1I"
-    # }
+    #     data = {
+    #       "senderid" => 345436757865,
+    #       "parameters"=>["-P /tmp"],
+    #       "url" => "https://www.youtube.com/watch?v=5CLeGECv-1I"
+    #     }
     ytdlwr = YTDLWrapper[data]
     Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
     ytdlwr.download
