@@ -21,7 +21,7 @@ The tool automatically handles temp/home paths and supports custom `yt-dlp` para
       # Optional yt-dlp arguments
       "parameters" => ["--no-playlist"],
 
-      # Prefixed URL: A--- for audio, V--- for video
+      # Prefixed URL: A--- for audio, V--- for video, can be ommited
       "url" => "A---https://www.youtube.com/watch?v=5CLeGECv-1I"
     }
 
