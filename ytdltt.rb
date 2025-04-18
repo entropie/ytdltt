@@ -187,7 +187,7 @@ module YTDLTT
       old_stdoutsync = $stdout.sync
       $stdout.sync = true
 
-      #run_download_command!
+      run_download_command!
 
       yield self if block_given?
 
