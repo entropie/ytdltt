@@ -71,11 +71,11 @@ module YTDLTT
     end
 
     def title_template
-      @title_template ||= '-o %(title).200s [%(id)s].%(ext)s'
+      @title_template ||= '%(title).200s [%(id)s].%(ext)s'
     end
 
     def ytdlp_default_arguments(*args)
-      [ title_template, '--restrict-filenames',
+      [ '-o', title_template, '--restrict-filenames',
         '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments' ] + args
     end
 
