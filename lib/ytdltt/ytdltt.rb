@@ -36,6 +36,7 @@ module YTDLTT
 
     attr_accessor *DEFAULTS.keys
     attr_accessor :config
+    attr_accessor :filename
 
     module Dataset
       def nrmlz
@@ -139,6 +140,9 @@ module YTDLTT
 
     attr_reader :media
     attr_accessor :mqtt
+    attr_reader :filename
+
+    WORMHOLE_TIMEOUT = 2*60
 
     def initialize(wrapperinst)
       @media = wrapperinst
@@ -167,9 +171,14 @@ module YTDLTT
           begin
             ytdlwr = YTDLTT::YTDLWrapper[data]
             Trompie.log "%s: %s" % [ytdlwr.media.class, ytdlwr.media.url]
-            ytdlwr.download
+
+            ret, filename = ytdlwr.download
+            if Wormhole.available?
+              Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
+            end
+
           rescue => e
-            Trompie.error "Download failed: #{e.class} - #{e.message}"
+            Trompie.debug{ Trompie.log "Download failed: #{e.class} - #{e.message}" } 
           end
         end
       end
@@ -187,30 +196,47 @@ module YTDLTT
       old_stdoutsync = $stdout.sync
       $stdout.sync = true
 
-      run_download_command!
+      retval, filename = run_download_command!
+      media.filename = filename
 
       yield self if block_given?
 
       $stdout.sync = old_stdoutsync
-      true
+      [retval, filename]
+    end
+
+    def extract_filname_from_ytdlp_out(line)
+      [
+        /Moving file "(.*?)"/,
+        /Destination:\s+(.+)$/,
+        /^\/.*\.(mp3|mp4|m4a); file is already in target format/,
+        /\[download\] (\/.*?\.(mp3|mp4|m4a)) has already been downloaded/,
+        /\[ExtractAudio\] Not converting audio (\/.*?\.(mp3|mp4|m4a)); file is already in target format/
+      ].each do |regexp|
+        match = line.match(regexp)
+        return File.expand_path(match[1].strip) if match
+      end
+      line
     end
 
     def run_download_command!
       $stdout.sync = true
+      filename = nil
 
       Trompie.debug { log "Arguments: %s" % PP.pp(command.unshift, "").gsub(/\n/, "") }
 
       Open3.popen2e(*command) do |stdin, stdout_and_err, wait_thr|
         stdout_and_err.each_line do |line|
           log line
+          filename = extract_filname_from_ytdlp_out(line)
         end
 
         exit_status = wait_thr.value
         unless exit_status.success?
-          return false
+          return [false, filename]
         end
       end
-      true
+      [true, filename]
     end
 
     def send_reply(content)
@@ -220,6 +246,7 @@ module YTDLTT
               options: { reply_to_message_id: media.data[:mid]}, "parse_mode": "Markdown" }
       Downloader.mqtt.submit("telegram/message", JSON.generate(rep))
     end
+
   end
 
 end
