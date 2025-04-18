@@ -37,24 +37,41 @@ module YTDLTT
     attr_accessor *DEFAULTS.keys
     attr_accessor :config
 
-    # entrypoint
-    def YTDLWrapper.[](inputdata, config: DEFAULTS)
-      Downloader.new(select_from_datasat(inputdata, config))
+    module Dataset
+      def nrmlz
+        keys.each do |k|
+          if k.is_a?(String)
+            self[k.to_sym] = delete(k)
+          end
+        end 
+        self 
+      end
     end
 
-    # normalizes url (which might be prefixed with A--- or V---) and
-    # selects corresponding sublcass
+    # entrypoint
+    def YTDLWrapper.[](inputdata, config: DEFAULTS)
+      Downloader.new(select_from_datasat(inputdata.extend(Dataset).nrmlz, config))
+    end
+
+
+    # get handler class from input hash
     def self.select_from_datasat(inputdata, config)
       data = inputdata.dup
-      oldurl = data.delete("url")
-      if oldurl =~ /^([AV])---/
-        data["url"] = oldurl.split("---").last
-      else
-        data["url"] = "#{config[:variant] == :audio ? "A" : "V"}---#{oldurl}"
-        return select_from_datasat(data, config)
+      url = data.delete(:url)
+
+      # add default prefix when not set
+      unless url =~ /^[AV]---/
+        prefix = config[:variant] == :audio ? "A" : "V"
+        url = "#{prefix}---#{url}"
       end
-      clz = $1 == "A" ? Audio : Video
-      clz.new(data, config)
+
+      if url =~ /^([AV])---(.+)$/
+        type = $1
+        data[:url] = URI($2).to_s
+        return (type.to_s.downcase == "a" ? Audio : Video).new(data, config)
+      else
+        raise ArgumentError, "Invalid URL format: #{url.inspect}"
+      end
     end
 
     def initialize(data, config)
@@ -63,7 +80,7 @@ module YTDLTT
     end
 
     def data_field(which)
-      data[which.to_s]
+      data[which.to_sym]
     end
 
     def url
@@ -166,7 +183,19 @@ module YTDLTT
       "yt-dlp"
     end
 
-    def download
+    def download(&blk)
+      old_stdoutsync = $stdout.sync
+      $stdout.sync = true
+
+      run_download_command
+
+      yield self if block_given?
+
+      $stdout.sync = old_stdoutsync
+      true
+    end
+
+    def run_download_command
       $stdout.sync = true
 
       Trompie.debug { log "Arguments: "+ PP.pp(command.unshift, "").gsub(/\n/, "") }
@@ -183,9 +212,10 @@ module YTDLTT
       end
       true
     end
-
   end
 
-  Downloader.loop!
+  if __FILE__ == $0
+    Downloader.loop!
+  end
 end
 
