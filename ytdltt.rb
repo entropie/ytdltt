@@ -71,7 +71,7 @@ module YTDLTT
     end
 
     def title_template
-      @title_template ||= '%(title).200s-[%(id)s].%(ext)s'
+      @title_template ||= '%(title).200s-%(id)s.%(ext)s'
     end
 
     def ytdlp_default_arguments(*args)
