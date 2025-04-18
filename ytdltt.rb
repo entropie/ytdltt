@@ -2,7 +2,7 @@
 require "shellwords"
 require "fileutils"
 require "open3"
-
+require "thread"
 
 selected_path =
 if File.exist?("/home/mit/Source/trompie")
@@ -22,7 +22,7 @@ module YTDLTT
 
   TOPIC = "yt/dl"
 
-  mqtt = MMQTT.new
+  #mqtt = MMQTT.new
   # ha = HA.new
 
   class YTDLWrapper
@@ -113,10 +113,45 @@ module YTDLTT
   end
 
   class Downloader
+
     include Trompie
+
     attr_reader :media
+    attr_accessor :mqtt
+
     def initialize(wrapperinst)
       @media = wrapperinst
+    end
+
+    def self.queue
+      @queue ||= Queue.new
+    end
+
+    def self.mqtt
+      @mqtt ||= MMQTT.new
+    end
+
+    def self.loop!
+      thread!
+      mqtt.subscribe(TOPIC) do |data|
+        Trompie.debug { Trompie.log "Enqueuing job: #{data.inspect}" }
+        Downloader.queue << data
+      end
+    end
+
+    def self.thread!
+      Thread.new do
+        loop do
+          data = Downloader.queue.pop
+          begin
+            ytdlwr = YTDLTT::YTDLWrapper[data]
+            Trompie.log "thread: choosing: %s: %s" % [ytdlwr.media.class, ytdlwr.media.url]
+            ytdlwr.download
+          rescue => e
+            Trompie.error "Download failed: #{e.class} - #{e.message}"
+          end
+        end
+      end
     end
 
     def command
@@ -144,18 +179,9 @@ module YTDLTT
       end
       true
     end
+
   end
-  
-  mqtt.subscribe(TOPIC) do |data|
-    #     data = {
-    #       "senderid" => 345436757865,
-    #       "parameters"=>["-P /tmp"],
-    #       "url" => "https://www.youtube.com/watch?v=5CLeGECv-1I"
-    #     }
-    ytdlwr = YTDLWrapper[data]
-    Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
-    ytdlwr.download
-  end
+
+  Downloader.loop!
 end
 
-#p Trompie::HA.new.make_req(:states, "sensor.temperature")
