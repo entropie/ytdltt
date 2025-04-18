@@ -146,14 +146,16 @@ module YTDLTT
     end
   end
   
-  mqtt.subscribe(TOPIC) do |data|
-    # data = {
-    #   "senderid" => 345436757865,
-    #   "parameters"=>["-P /tmp"],
-    #   "url" => "V---https://www.youtube.com/watch?v=5CLeGECv-1I"
-    # }
-    ytdlwr = YTDLWrapper[data]
-    Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
-    ytdlwr.download
-  end
+  # mqtt.subscribe(TOPIC) do |data|
+  #   # data = {
+  #   #   "senderid" => 345436757865,
+  #   #   "parameters"=>["-P /tmp"],
+  #   #   "url" => "V---https://www.youtube.com/watch?v=5CLeGECv-1I"
+  #   # }
+  #   ytdlwr = YTDLWrapper[data]
+  #   Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
+  #   ytdlwr.download
+  # end
 end
+
+#p Trompie::HA.new.make_req(:states, "sensor.temperature")
