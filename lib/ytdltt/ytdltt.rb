@@ -11,7 +11,7 @@ else
   "/etc/nixos/res/gems/trompie/lib"
 end
 
-selected_path = "/etc/nixos/res/gems/trompie/lib"
+#selected_path = "/etc/nixos/res/gems/trompie/lib"
 
 $LOAD_PATH.unshift(selected_path)
 puts " > trompie lib #{selected_path}"
