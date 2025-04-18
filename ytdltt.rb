@@ -70,8 +70,12 @@ module YTDLTT
       data_field(:url)
     end
 
+    def title_template
+      @title_template ||= '-o %(title).200s [%(id)s].%(ext)s'
+    end
+
     def ytdlp_default_arguments(*args)
-      [ '-o %(title).200s.%(ext)s', '--restrict-filenames',
+      [ title_template, '--restrict-filenames',
         '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments' ] + args
     end
 
