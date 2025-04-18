@@ -187,7 +187,7 @@ module YTDLTT
       old_stdoutsync = $stdout.sync
       $stdout.sync = true
 
-      run_download_command
+      run_download_command!
 
       yield self if block_given?
 
@@ -195,7 +195,7 @@ module YTDLTT
       true
     end
 
-    def run_download_command
+    def run_download_command!
       $stdout.sync = true
 
       Trompie.debug { log "Arguments: "+ PP.pp(command.unshift, "").gsub(/\n/, "") }
