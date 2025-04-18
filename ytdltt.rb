@@ -187,7 +187,7 @@ module YTDLTT
       old_stdoutsync = $stdout.sync
       $stdout.sync = true
 
-      run_download_command!
+      #run_download_command!
 
       yield self if block_given?
 
@@ -198,7 +198,7 @@ module YTDLTT
     def run_download_command!
       $stdout.sync = true
 
-      Trompie.debug { log "Arguments: "+ PP.pp(command.unshift, "").gsub(/\n/, "") }
+      Trompie.debug { log "Arguments: %s" % PP.pp(command.unshift, "").gsub(/\n/, "") }
 
       Open3.popen2e(*command) do |stdin, stdout_and_err, wait_thr|
         stdout_and_err.each_line do |line|
@@ -211,6 +211,14 @@ module YTDLTT
         end
       end
       true
+    end
+
+    def send_reply(content)
+      rep = { type: :message,
+              chatId: media.data[:senderid],
+              content: content,
+              options: { reply_to_message_id: media.data[:mid]} }
+      Downloader.mqtt.submit("telegram/message", JSON.generate(rep))
     end
   end
 
