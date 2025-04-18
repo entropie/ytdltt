@@ -11,6 +11,8 @@ else
   "/etc/nixos/res/gems/trompie/lib"
 end
 
+selected_path = "/etc/nixos/res/gems/trompie/lib"
+
 $LOAD_PATH.unshift(selected_path)
 puts " > trompie lib #{selected_path}"
 
@@ -159,6 +161,7 @@ module YTDLTT
     def self.loop!
       thread!
       mqtt.subscribe(TOPIC) do |data|
+        next if data.respond_to?(:empty?) and data.empty?
         Trompie.debug { Trompie.log "Enqueuing job: #{data.inspect}" }
         Downloader.queue << data
       end
@@ -176,6 +179,8 @@ module YTDLTT
             if Wormhole.available?
               Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
             end
+            Trompie.log("clearing topic yt/dl")
+            Downloader.mqtt.submit("yt/dl", "{}", retain: true)
 
           rescue => e
             Trompie.debug{ Trompie.log "Download failed: #{e.class} - #{e.message}" } 
