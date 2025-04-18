@@ -149,7 +149,7 @@ module YTDLTT
           data = Downloader.queue.pop
           begin
             ytdlwr = YTDLTT::YTDLWrapper[data]
-            Trompie.log "thread: choosing: %s: %s" % [ytdlwr.media.class, ytdlwr.media.url]
+            Trompie.log "%s: %s" % [ytdlwr.media.class, ytdlwr.media.url]
             ytdlwr.download
           rescue => e
             Trompie.error "Download failed: #{e.class} - #{e.message}"
