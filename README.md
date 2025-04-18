@@ -10,7 +10,7 @@ The tool automatically handles temp/home paths and supports custom `yt-dlp` para
 - Ruby  
 - `yt-dlp` in `$PATH`  
 - MQTT broker  
-- Optional: [Trompie](https://github.com/your-org/trompie) library for MQTT + logging integration
+- Optional: [Trompie](https://github.com/entropie/trompie) library for MQTT + logging integration
 
 
 ## Using
