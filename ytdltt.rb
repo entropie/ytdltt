@@ -50,7 +50,7 @@ module YTDLTT
       if oldurl =~ /^([AV])---/
         data["url"] = oldurl.split("---").last
       else
-        data["url"] = "#{DEFAULT_VARIANT == :audio ? "A" : "V"}---#{oldurl}"
+        data["url"] = "#{config[:variant] == :audio ? "A" : "V"}---#{oldurl}"
         return select_from_datasat(data)
         end
       clz = $1 == "A" ? Audio : Video
@@ -106,7 +106,7 @@ module YTDLTT
     def ytdlp_default_arguments
       super '-f bestvideo+bestaudio/best', '--merge-output-format mp4'
     end
-
+    
     def target_directory
       config[:videoIncoming]
     end
@@ -122,7 +122,7 @@ module YTDLTT
     def command
       [bin, @media.full_arguments].flatten.map { |p| Shellwords.split(p) }.flatten
     end
-
+    
     def bin
       "yt-dlp"
     end
@@ -146,16 +146,16 @@ module YTDLTT
     end
   end
   
-  # mqtt.subscribe(TOPIC) do |data|
-  #   # data = {
-  #   #   "senderid" => 345436757865,
-  #   #   "parameters"=>["-P /tmp"],
-  #   #   "url" => "V---https://www.youtube.com/watch?v=5CLeGECv-1I"
-  #   # }
-  #   ytdlwr = YTDLWrapper[data]
-  #   Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
-  #   ytdlwr.download
-  # end
+  mqtt.subscribe(TOPIC) do |data|
+    # data = {
+    #   "senderid" => 345436757865,
+    #   "parameters"=>["-P /tmp"],
+    #   "url" => "V---https://www.youtube.com/watch?v=5CLeGECv-1I"
+    # }
+    ytdlwr = YTDLWrapper[data]
+    Trompie.log "choosing: %s:%s" % [ytdlwr.media.class, ytdlwr.media.url]
+    ytdlwr.download
+  end
 end
 
 #p Trompie::HA.new.make_req(:states, "sensor.temperature")
