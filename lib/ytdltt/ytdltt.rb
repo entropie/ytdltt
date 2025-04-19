@@ -95,7 +95,7 @@ module YTDLTT
     end
 
     def ytdlp_default_arguments(*args)
-      [ '-o', title_template, '--restrict-filenames',
+      [ '-o', title_template, '--restrict-filenames', '--print', 'after_move:filepath',
         '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments' ] + args
     end
 
@@ -179,8 +179,6 @@ module YTDLTT
             if Wormhole.available?
               Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
             end
-            Trompie.log("clearing topic yt/dl")
-            Downloader.mqtt.submit("yt/dl", "{}", retain: true)
 
           rescue => e
             Trompie.debug{ Trompie.log "Download failed: #{e.class} - #{e.message}" } 
@@ -210,32 +208,17 @@ module YTDLTT
       [retval, filename]
     end
 
-    def extract_filname_from_ytdlp_out(line)
-      [
-        /\[MoveFiles\] Moving file ".*?" to "(.*?)"/,
-        /Moving file "(.*?)"/,
-        /Destination:\s+(.+)$/,
-        /^\/.*\.(mp3|mp4|m4a); file is already in target format/,
-        /\[download\] (\/.*?\.(mp3|mp4|m4a)) has already been downloaded/,
-        /\[ExtractAudio\] Not converting audio (\/.*?\.(mp3|mp4|m4a)); file is already in target format/
-      ].each do |regexp|
-        match = line.match(regexp)
-        return File.expand_path(match[1].strip) if match
-      end
-      line
-    end
-
     def run_download_command!
       $stdout.sync = true
       filename = nil
 
-      Trompie.debug { log "Arguments: %s" % PP.pp(command.unshift, "").gsub(/\n/, "") }
+      Trompie.debug { log "YTDLTT: '%s'" %  command.join(" ")}
 
       Open3.popen2e(*command) do |stdin, stdout_and_err, wait_thr|
         stdout_and_err.each_line do |line|
-          log line
-          filename = extract_filname_from_ytdlp_out(line)
+          filename = line.strip
         end
+        Trompie.debug { log "downloaded as #{filename}" }
 
         exit_status = wait_thr.value
         unless exit_status.success?
@@ -250,7 +233,7 @@ module YTDLTT
               chatId: media.data[:senderid],
               content: content,
               options: { reply_to_message_id: media.data[:mid]}, "parse_mode": "Markdown" }
-      Downloader.mqtt.submit("telegram/message", JSON.generate(rep))
+      Downloader.mqtt.submit("telegram/message", JSON.generate(rep), retain: false)
     end
 
   end
