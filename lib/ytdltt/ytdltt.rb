@@ -105,7 +105,7 @@ module YTDLTT
 
     def user_arguments
       user_parameters = Array(@data['parameters'])
-      unless user_parameters.any?{ |up| "-P" }
+      unless user_parameters.any?{ |up| up.include?("-P") }
         tdir = config[:videoIncoming]
         tmp = target_directory + "/.tmp"
         FileUtils.mkdir_p(target_directory, verbose: true)
