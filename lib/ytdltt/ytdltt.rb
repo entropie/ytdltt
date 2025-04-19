@@ -214,7 +214,7 @@ module YTDLTT
       $stdout.sync = true
       filename = nil
 
-      Trompie.debug { log "YTDLTT: '%s'" %  command.join(" ")}
+      Trompie.debug { log "YTDLTT::Command: '%s'" %  command.join(" ")}
 
       Open3.popen2e(*command) do |stdin, stdout_and_err, wait_thr|
         stdout_and_err.each_line do |line|
