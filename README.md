@@ -7,7 +7,13 @@ is fine). It watches a mqtt topic for a JSON string of paramters,
 downloads the content and another mqtt topic to reply a wormhole code
 to the sender who will be able to use that code to download directly.
 
-We have chosen json because it should work well with node-red.
+It should work well with node-red and telegram. node-red receives the
+telegram messages:
+
+* checks if sender is authorized
+* optionally we may apply params, debending on senderID
+* downloads video
+* replies with wormhole code if applicable  - and fills mqtt-topic.
 
 ### Features
 
@@ -33,7 +39,7 @@ We have chosen json because it should work well with node-red.
   "mid": 2834,
   "parameters": ["-P", "/home/media/mom/incoming"]
 }
-
+```
 
 ### Example ytdltt.servie for systemd placed in `~/.config/systemd/user/ytdltt.service`, edit to your needs
 
