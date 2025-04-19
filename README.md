@@ -1,29 +1,28 @@
-# YTDLTT
+## YTDLTT – MQTT-Controlled YouTube Downloader
 
-**YTDLTT** is a small Ruby wrapper around `yt-dlp` that listens to an MQTT topic (`yt/dl`) and downloads YouTube videos or audio tracks.  
-By prefixing the URL with `A---` (audio) or `V---` (video), you can control the variant.  
-Downloads are stored in predefined directories (e.g. for Jellyfin), making new content instantly available.  
-The tool automatically handles temp/home paths and supports custom `yt-dlp` parameters.
+ytdltt listens to the `yt/dl` MQTT topic and downloads YouTube videos or audio using `yt-dlp`.
 
-## Requirements
+### Features
 
-- Ruby  
-- `yt-dlp` in `$PATH`  
-- MQTT broker  
-- Optional: [Trompie](https://github.com/entropie/trompie) library for MQTT + logging integration
+- Audio or video download via URL prefix:
+  - `A---https://...` → audio (MP3)
+  - `V---https://...` → video (MP4)
+- Telegram message via MQTT on completion
+- Optional: [Magic Wormhole](https://magic-wormhole.readthedocs.io/) one-time download code
 
+### Requirements
 
-## Using
-    data = {
-      # Unique sender ID (telegram)
-      "senderid" => 345436757865,
+- `yt-dlp` in `$PATH`
+- MQTT broker
+- Ruby with [`Trompie`](https://github.com/entropie/trompie)
+- Optional: `magic-wormhole`
 
-      # Optional yt-dlp arguments
-      "parameters" => ["--no-playlist"],
+### Example MQTT Payload
 
-      # Prefixed URL: A--- for audio, V--- for video, can be ommited
-      "url" => "A---https://www.youtube.com/watch?v=5CLeGECv-1I"
-    }
-
-    ytdl = YTDLTT::YTDLWrapper[data]
-    ytdl.download
+```json
+{
+  "url": "A---https://youtu.be/xyz123",
+  "senderid": 849936978,
+  "mid": 2834,
+  "parameters": ["-P", "/home/media/mom/incoming"]
+}
