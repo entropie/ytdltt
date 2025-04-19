@@ -34,10 +34,10 @@ telegram messages:
 
 ```json
 {
-  "url": "A---https://youtu.be/xyz123",
-  "senderid": 849936978,
-  "mid": 2834,
-  "parameters": ["-P", "/home/media/mom/incoming"]
+  "url": "A---https://youtu.be/xyz123", # prefix says if audio (A---) only or complete video (V---)
+  "senderid": 849936978, # is not really needed as well
+  "mid": 2834, # optionally, reply to message id
+  "parameters": ["-P", "/home/media/mom/incoming"] # can be empty
 }
 ```
 
