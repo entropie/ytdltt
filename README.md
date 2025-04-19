@@ -33,7 +33,7 @@ telegram messages:
 ### Example MQTT Payload
 
 
-* `url`: mandatory; prefix says if audio (A---) only or complete video (V---), prefix defaults to config[:variant] // audio
+* `url`: mandatory; prefix says if audio (A---) only or complete video (V---), prefix defaults to `config[:variant]`
 * `senderid`: optional; could be used (is not) except for telegram reply
 * `mid`: optional; telegrams conversation id, 
 * `paramters`: optional; expand yt-dlp argument list, also add different output path ( ["-P", "/tmp/foo"] )
