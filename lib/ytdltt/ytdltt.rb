@@ -104,9 +104,9 @@ module YTDLTT
     end
 
     def user_arguments
-      user_parameters = Array(@data['parameters'])
-      Trompie.debug { Trompie.log "YTDLTT params:#{data.inspect}" }
-      unless user_parameters.any?{ |up| up.include?("-P" }
+      user_parameters = Array(@data[:parameters])
+      Trompie.debug { Trompie.log "YTDLTT::Params:#{data.inspect}" }
+      unless user_parameters.any?{ |up| up.include?("-P") }
         tdir = config[:videoIncoming]
         tmp = target_directory + "/.tmp"
         FileUtils.mkdir_p(target_directory, verbose: true)
