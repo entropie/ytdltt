@@ -2,6 +2,13 @@
 
 ytdltt listens to the `yt/dl` MQTT topic and downloads YouTube videos or audio using `yt-dlp`.
 
+The intended usecase is that this apps runs as systemd service (user
+is fine). It watches a mqtt topic for a JSON string of paramters,
+downloads the content and another mqtt topic to reply a wormhole code
+to the sender who will be able to use that code to download directly.
+
+We have chosen json because it should work well with node-red.
+
 ### Features
 
 - Audio or video download via URL prefix:
@@ -26,3 +33,25 @@ ytdltt listens to the `yt/dl` MQTT topic and downloads YouTube videos or audio u
   "mid": 2834,
   "parameters": ["-P", "/home/media/mom/incoming"]
 }
+
+
+### Example ytdltt.servie for systemd placed in `~/.config/systemd/user/ytdltt.service`, edit to your needs
+
+    Θ cat ~/.config/systemd/user/ytdltt.service
+    [Unit]
+    Description=Run ytdltt Ruby script (user)
+    After=network.target
+
+    [Service]
+    Type=simple
+    ExecStart=/run/current-system/sw/bin/ruby /etc/nixos/res/gems/ytdltt/bin/ytdltt
+    WorkingDirectory=/etc/nixos/res/gems/ytdltt
+    Environment=PATH=/run/current-system/sw/bin:/etc/nixos/res/gems/bin
+    RestartSec=30s
+    StartLimitBurst=5
+
+
+    Restart=on-failure
+
+    [Install]
+    WantedBy=default.target
