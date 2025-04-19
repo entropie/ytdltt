@@ -220,7 +220,7 @@ module YTDLTT
         stdout_and_err.each_line do |line|
           filename = line.strip
         end
-        Trompie.debug { log "downloaded as #{filename}" }
+        Trompie.debug { log "YTDLTT::Download finished #{filename}" }
 
         exit_status = wait_thr.value
         unless exit_status.success?
