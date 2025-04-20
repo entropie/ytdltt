@@ -187,7 +187,7 @@ module YTDLTT
 
     def self.loop!
       thread!
-      Trompie.debug { Trompie.log "YTDLTT: subscribing {}" }
+      Trompie.debug { Trompie.log "YTDLTT: subscribing #{TOPIC}" }
       mqtt.subscribe(TOPIC) do |data|
         next if data.respond_to?(:empty?) and data.empty?
         Trompie.debug { Trompie.log "YTDLTT: queueing incoming message: #{data.inspect}" }
