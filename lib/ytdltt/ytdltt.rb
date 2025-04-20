@@ -168,7 +168,7 @@ module YTDLTT
     include Trompie
 
     attr_reader :media
-    attr_accessor :mqtt
+    attr_accessor :mqtt, :bin
     attr_reader :filename
 
     WORMHOLE_TIMEOUT = 2*60
