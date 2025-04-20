@@ -1,34 +1,44 @@
 require "minitest/autorun"
 require_relative "../ytdltt"
 
-# class TestYTDLWrapperBase < Minitest::Test
-#   def setup
-#     @config = {
-#       audioIncoming: "/tmp/audio",
-#       videoIncoming: "/tmp/video",
-#       variant: :audio
-#     }
-#   end
 
-# end
+module Input
+  INPUTS = [
+    {"url": "https://www.youtube.com/watch?v=I8mS8Pfgros", "senderid": 849936978, "parameters": [], "mid": 2834}
+  ]
+end
 
-class TestReply < Minitest::Test
 
+class TestParameters < Minitest::Test
+  include Input
   def setup
-    @input = {"url": "https://www.youtube.com/watch?v=I8mS8Pfgros", "senderid": 849936978, "parameters": [], "mid": 2834}
-    @input1 = {"url": "V---https://www.youtube.com/watch?v=I8mS8Pfgros", "senderid": 849936978, "parameters": [], "mid": 2834}
+    @input = Input::INPUTS.first
     @wrapper = YTDLTT::YTDLWrapper[@input]
-    @wrapper1 = YTDLTT::YTDLWrapper[@input1]
   end
 
-  def test_t1
-    # puts
-    # pp @wrapper.media
+  def test_target_from_parameter
+    newp = ["-P", "/tmp"]
+    a = @input.merge(parameters: newp)
+    @wrapper = YTDLTT::YTDLWrapper[a]
+    
+    assert_equal ["-P", "temp:/tmp/.tmp", "-P", "home:/tmp"], @wrapper.media.path_arguments
+    assert_equal "/tmp", @wrapper.media.target_directory
   end
-  def test_t2
-    @wrapper1.download do |dwnld|
-      dwnld.send_reply
 
-    end
+  def test_target_from_no_parameter
+    @wrapper = YTDLTT::YTDLWrapper[@input]
+    assert_equal @wrapper.media.user_arguments, []
+    assert_equal @wrapper.media.target_directory, "/home/media/youtube"
   end
+
+  def test_other_user_parameter
+    newp = ["--foo", "bar", "-P", "/tmp", "keke", "lala"]
+
+    a = @input.merge(parameters: newp)
+    @wrapper = YTDLTT::YTDLWrapper[a]
+    assert_equal "/tmp", @wrapper.media.target_directory
+    assert_equal ["--foo", "bar", "keke", "lala"], @wrapper.media.user_arguments
+    pp @wrapper.command
+  end
+
 end

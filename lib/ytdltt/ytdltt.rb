@@ -14,9 +14,9 @@ end
 #selected_path = "/etc/nixos/res/gems/trompie/lib"
 
 $LOAD_PATH.unshift(selected_path)
-puts " > trompie lib #{selected_path}"
 
 require "trompie"
+Trompie.log_basedir
 
 module YTDLTT
 
@@ -50,7 +50,8 @@ module YTDLTT
 
     # entrypoint
     def YTDLWrapper.[](inputdata, config: DEFAULTS)
-      Downloader.new(select_from_datasat(inputdata.extend(Dataset).nrmlz, config))
+      ret = Downloader.new(select_from_datasat(inputdata.extend(Dataset).nrmlz, config))
+      ret
     end
 
     # get handler class from input hash
@@ -76,6 +77,7 @@ module YTDLTT
     def initialize(data, config)
       @config = config
       @data = data
+      normalize_paths!
     end
 
     def data_field(which)
@@ -96,21 +98,48 @@ module YTDLTT
     end
 
     def full_arguments
-      [ytdlp_default_arguments, user_arguments, url].flatten
+      [ytdlp_default_arguments,
+       path_arguments,
+       user_arguments,
+       url].flatten
+    end
+
+    def path_arguments
+      ret = []
+      ret.push("-P", "temp:%s/.tmp" % [target_directory])
+      ret.push("-P", "home:%s" % [target_directory])
+      #p directories = [ret[1], ret[3]].map{ |d| d.split(":").last }
+      ret
+    end
+
+    def user_or_default_target_directory(kind)
+      unless @target_directory
+        uparams = Array(@data[:parameters])
+        user_pathind = uparams.index("-P")
+        if user_pathind && uparams[user_pathind + 1]
+          @target_directory = uparams[user_pathind + 1]
+        else
+          @target_directory = config[kind.to_sym]
+        end
+      end
+      @target_directory  
+    end
+
+    def normalize_paths!
+      target_directory
+      user_arguments
     end
 
     def user_arguments
-      user_parameters = Array(@data[:parameters])
-      Trompie.debug { Trompie.log "YTDLTT::Params: #{data.inspect}" }
-
-      unless user_parameters.any?{ |up| up.include?("-P") }
-        tdir = config[:videoIncoming]
-        tmp = target_directory + "/.tmp"
-        FileUtils.mkdir_p(target_directory, verbose: true)
-        user_parameters.push("-P", "temp:%s" % [tmp])
-        user_parameters.push("-P", "home:%s" % [target_directory])
+      unless @user_arguments
+        params = Array(@data[:parameters])
+        Trompie.debug { Trompie.log "YTDLTT::Params: #{data.inspect}" }
+        if (i = params.index("-P"))
+          params.slice!(i, 2)
+        end
+        @user_arguments = params
       end
-      user_parameters
+      @user_arguments
     end
   end
 
@@ -120,7 +149,7 @@ module YTDLTT
     end
 
     def target_directory
-      config[:audioIncoming]
+      user_or_default_target_directory(:audioIncoming)
     end
   end
 
@@ -130,7 +159,7 @@ module YTDLTT
     end
     
     def target_directory
-      config[:videoIncoming]
+      user_or_default_target_directory(:videoIncoming)
     end
   end
 
