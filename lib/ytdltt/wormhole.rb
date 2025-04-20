@@ -1,6 +1,8 @@
 require "pty"
 require "pty"
 
+$stdout.sync = true;
+
 module Wormhole
 
   class TransferComplete < RuntimeError; end
@@ -11,10 +13,8 @@ module Wormhole
 
   def self.ytdltt_block
     -> (file, wrapper, timeout, *args) { 
-      Trompie.do_with_synced_stdout do
-        Wormhole.send_file(file, timeout: timeout) do |code|
-          wrapper.send_reply("#{code}")
-        end
+      Wormhole.send_file(file, timeout: timeout) do |code|
+        wrapper.send_reply("#{code}")
       end
     }
   end
@@ -41,7 +41,6 @@ module Wormhole
                   end
 
                   if line.include?("File sent") || line.include?("Goodbye")
-                    Trompie.debug { Trompie.log "YTDLTT::Wormhole: complete for #{file_path}" }
                     raise TransferComplete, "completed #{file_path}"
                   end
                 end
