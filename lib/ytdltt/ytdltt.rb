@@ -158,20 +158,22 @@ module YTDLTT
 
     def self.loop!
       thread!
+      Trompie.debug { Trompie.log "YTDLTT: subscribing {}" }
       mqtt.subscribe(TOPIC) do |data|
         next if data.respond_to?(:empty?) and data.empty?
-        Trompie.debug { Trompie.log "Enqueuing job: #{data.inspect}" }
+        Trompie.debug { Trompie.log "YTDLTT: queueing incoming message: #{data.inspect}" }
         Downloader.queue << data
       end
     end
 
     def self.thread!
+      Trompie.debug { Trompie.log "YTDLTT: looping the queue" }
       Thread.new do
         loop do
           data = Downloader.queue.pop
           begin
             ytdlwr = YTDLTT::YTDLWrapper[data]
-            Trompie.log "%s: %s" % [ytdlwr.media.class, ytdlwr.media.url]
+            Trompie.debug { Trompie.log "YTDLTT: %s: %s" % [ytdlwr.media.class, ytdlwr.media.url] }
 
             ret, filename = ytdlwr.download
             if Wormhole.available?
@@ -179,7 +181,7 @@ module YTDLTT
             end
 
           rescue => e
-            Trompie.debug{ Trompie.log "Download failed: #{e.class} - #{e.message}" } 
+            Trompie.debug{ Trompie.log "YTDLTT: Download failed: #{e.class} - #{e.message}" } 
           end
         end
       end
@@ -227,11 +229,15 @@ module YTDLTT
     end
 
     def send_reply(content)
-      rep = { type: :message,
-              chatId: media.data[:senderid],
+      topic = "telegram/message"
+      chatid, message_id = media.data[:senderid], media.data[:mid]
+      rep = { type: :message, 
+              chatId: chatid,
               content: content,
-              options: { reply_to_message_id: media.data[:mid]}, "parse_mode": "Markdown" }
-      Downloader.mqtt.submit("telegram/message", JSON.generate(rep), retain: false)
+              options: { reply_to_message_id: message_id}, "parse_mode": "Markdown" }
+      Trompie.debug { Trompie.log "YTDLTT::MQTT(#{topic}) submitting #{rep.inspect}" }
+      Downloader.mqtt.
+        submit(topic, JSON.generate(rep), retain: false)
     end
 
   end
