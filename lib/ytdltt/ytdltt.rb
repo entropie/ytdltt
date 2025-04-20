@@ -190,7 +190,7 @@ module YTDLTT
       Trompie.debug { Trompie.log "YTDLTT: subscribing #{TOPIC}" }
       mqtt.subscribe(TOPIC) do |data|
         next if data.respond_to?(:empty?) and data.empty?
-        Trompie.debug { Trompie.log "YTDLTT: queueing incoming message: #{data.inspect}" }
+        Trompie.debug { Trompie.log "YTDLTT::MQTT queueing incoming message: #{data.inspect}" }
         Downloader.queue << data
       end
     end
