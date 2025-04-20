@@ -221,7 +221,7 @@ module YTDLTT
     end
     
     def bin
-      "yt-dlp"
+      @bin || "yt-dlp"
     end
 
     def download(&blk)
