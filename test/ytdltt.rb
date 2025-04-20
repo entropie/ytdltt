@@ -38,7 +38,6 @@ class TestParameters < Minitest::Test
     @wrapper = YTDLTT::YTDLWrapper[a]
     assert_equal "/tmp", @wrapper.media.target_directory
     assert_equal ["--foo", "bar", "keke", "lala"], @wrapper.media.user_arguments
-    pp @wrapper.command
   end
 
 end
