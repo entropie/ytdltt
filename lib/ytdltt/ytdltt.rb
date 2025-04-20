@@ -177,6 +177,12 @@ module YTDLTT
       @media = wrapperinst
     end
 
+    def self.download_syncron(url, target_dir, &blk)
+      optionhash = { url: url, parameters: ["-P", target_dir] }
+      wrapper = YTDLWrapper[optionhash]
+      wrapper.download(&blk)
+    end
+
     def self.queue
       @queue ||= Queue.new
     end

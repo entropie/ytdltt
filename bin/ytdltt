@@ -4,6 +4,16 @@ require_relative "../lib/ytdltt"
 
 module YTDLTT
 
-  Downloader.loop!
+  if ARGV.size > 0
+    urls = ARGV
+    target_dir = File.expand_path(Dir.pwd)
+
+    urls.each do |url|
+      wrapper = Downloader.download_syncron(url, target_dir)
+    end
+
+  else
+    Downloader.loop!
+  end
 
 end
