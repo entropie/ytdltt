@@ -24,9 +24,6 @@ module YTDLTT
 
   TOPIC = "yt/dl"
 
-  #mqtt = MMQTT.new
-  # ha = HA.new
-
   class YTDLWrapper
     attr_reader :data
 
@@ -55,7 +52,6 @@ module YTDLTT
     def YTDLWrapper.[](inputdata, config: DEFAULTS)
       Downloader.new(select_from_datasat(inputdata.extend(Dataset).nrmlz, config))
     end
-
 
     # get handler class from input hash
     def self.select_from_datasat(inputdata, config)
