@@ -18,6 +18,8 @@ $LOAD_PATH.unshift(selected_path)
 require "trompie"
 Trompie.log_basedir
 
+$stdout.sync = true
+
 module YTDLTT
 
   include Trompie
@@ -231,20 +233,15 @@ module YTDLTT
     end
 
     def download(&blk)
-      old_stdoutsync = $stdout.sync
-      $stdout.sync = true
-
       retval, filename = run_download_command!
       media.filename = filename
 
       yield self if block_given?
 
-      $stdout.sync = old_stdoutsync
       [retval, filename]
     end
 
     def run_download_command!
-      $stdout.sync = true
       filename = nil
 
       Trompie.debug { log "YTDLTT::Command: '%s'" %  command.join(" ")}

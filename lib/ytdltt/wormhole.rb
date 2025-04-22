@@ -1,8 +1,6 @@
 require "pty"
 require "pty"
 
-$stdout.sync = true;
-
 module Wormhole
 
   class TransferComplete < RuntimeError; end
