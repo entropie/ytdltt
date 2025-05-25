@@ -1,5 +1,4 @@
 require "pty"
-require "pty"
 
 module Wormhole
 
