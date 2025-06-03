@@ -1,1 +1,1 @@
-gem "trompie", path: "/home/mit/Source/trompie"
+gem "trompie", git: "https://github.com/entropie/trompie"
