@@ -5,4 +5,5 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Michael Trommer']
   spec.files         = Dir['lib/**/*', 'bin/*']
   spec.require_paths = ['lib']
+  spec.add_dependency "mqtt"
 end
