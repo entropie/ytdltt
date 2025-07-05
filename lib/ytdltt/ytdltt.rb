@@ -96,6 +96,7 @@ module YTDLTT
 
     def ytdlp_default_arguments(*args)
       [ '-o', title_template, '--restrict-filenames', '--print', 'after_move:filepath',
+        '--fragment-retries', "10", "--retries", "0",
         '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments' ] + args
     end
 
