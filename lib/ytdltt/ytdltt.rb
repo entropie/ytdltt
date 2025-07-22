@@ -180,8 +180,9 @@ module YTDLTT
       @media = wrapperinst
     end
 
-    def self.download_syncron(url, target_dir, &blk)
-      optionhash = { url: url, parameters: ["-P", target_dir] }
+    def self.download_syncron(url, target_dir, opts: [], &blk)
+      combined_opts = ["-P", target_dir, opts].flatten
+      optionhash = { url: url, parameters: combined_opts }
       wrapper = YTDLWrapper[optionhash]
       wrapper.download(&blk)
     end
@@ -223,6 +224,11 @@ module YTDLTT
           end
         end
       end
+    end
+
+
+    def raw_command
+      [bin, @media.data[:parameters], @media.url].flatten
     end
 
     def command
