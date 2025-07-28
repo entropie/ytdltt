@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 
-
-
-# make sure to really stfu to be able pipe output
-
 $original_stdout = $stdout
 
 if ARGV.any?{ |a| ["--debug", "-d"].include?(a)}
