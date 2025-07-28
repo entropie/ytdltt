@@ -1,12 +1,17 @@
-#!/usr/bin/env/ruby
+#!/usr/bin/env ruby
 
 
 
 # make sure to really stfu to be able pipe output
-devnull = File.open(File::NULL, "w")
-$original_stdout = $stdout
-$stdout = devnull
 
+$original_stdout = $stdout
+
+if ARGV.any?{ |a| ["--debug", "-d"].include?(a)}
+  $debug = true
+else
+  # make sure there is no output before the actual subtitles so we can pipe
+  $stdout = File.open(File::NULL, "w")
+end
 
 require "fileutils"
 require_relative "../lib/ytdltt"
@@ -16,50 +21,59 @@ require_relative "../lib/ytdltt/srt_extract.rb"
 module YTDLTT
   
   if ARGV.size > 0
-    *opts, url = *ARGV
+    *opts, url = *ARGV.reject{ |o| ["--debug", "-d"].include?(o) }
 
     target_dir = File.expand_path(Dir.pwd)
 
     subtitleopts = [
-      "--write-auto-sub",
-      "--sleep-requests", "0.75",
-      "--sleep-subtitles", "5",
-      "--convert-subs", "srt",
-      "-o", "%(id)s.%(ext)s",
-      "--skip-download",
-      "--no-mtime",
-      "--no-playlist",
-      "-P", "."
+      "--write-auto-sub", "--sleep-requests", "0.75",
+      "--sleep-subtitles", "5", "--convert-subs", "srt",
+      "-o", "%(id)s.%(ext)s", "--skip-download",
+      "--no-mtime", "--no-playlist",
     ]
+
+    unless opts.include?("--sub-lang")
+      subtitleopts += ["--sub-lang", "en"]
+    end
+
+    unless opts.include?("-P") || opts.include?("--path")
+      subtitleopts += ["-P", "."]
+    end
 
     combined_opts = [*subtitleopts, *opts]
 
-    if not combined_opts.include?("--sub-lang")
-      subtitleopts << "--sub-lang" << "en"
-    end
 
     ohash = { url: url, parameters: combined_opts }
 
     wrapper = YTDLWrapper[ohash, config: {}]
     ytid = url.scan(/\bv=([a-zA-Z0-9_-]{11})\b/).flatten.join
+    language_str = combined_opts[combined_opts.index("--sub-lang") + 1]
 
-   
-    puts wrapper.raw_command
-    Open3.popen2e(*wrapper.raw_command) do |stdin, stdout_and_err, wait_thr|
-      exit_status = wait_thr.value
-      puts stdout_and_err.read
+    probable_filename = "/tmp/%s.%s.srt" % [ytid, language_str]
+
+    stdout = []
+    if File.exist?(probable_filename)
+      puts "skipping download `%s' already existing" % probable_filename
+    else
+      Dir.chdir("/tmp") do
+        Open3.popen2e(*wrapper.raw_command) do |stdin, stdout_and_err, wait_thr|
+          out.each_line { |line| stdout << line; puts line if $debug }
+          raise "yt-dlp failed" unless wait_thr.value.success?
+        end
+      end
     end
 
     $stdout = $original_stdout
-    subtitlefile = Dir.glob("#{ytid}.*.srt").shift
 
-    abort "no subitle file" unless subtitlefile
-
+    subtitlefile = probable_filename
+    abort "no subtitle file" if not File.exist?(probable_filename)
     lines = File.readlines(subtitlefile, chomp: true)
 
     puts SRTExtract.extract_subtitles(lines.join("\n"))
-    FileUtils.rm(subtitlefile)
+
+  else
+    $stdout = $original_stdout
+
+    $stderr.puts "Usage: %s [--sub-lang en][-P <path>][... yt-dlp arguments] <yt-url>" % [$0]
   end
-
-
 end
