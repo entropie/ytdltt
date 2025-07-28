@@ -1,19 +1,12 @@
-#!/usr/bin/env ruby
 require "shellwords"
 require "fileutils"
 require "open3"
 require "thread"
 
-selected_path =
 if File.exist?("/home/mit/Source/trompie")
-  "/home/mit/Source/trompie/lib"
-else
-  "/etc/nixos/res/gems/trompie/lib"
+  selected_path = "/home/mit/Source/trompie/lib"
+  $LOAD_PATH.unshift(selected_path)
 end
-
-#selected_path = "/etc/nixos/res/gems/trompie/lib"
-
-$LOAD_PATH.unshift(selected_path)
 
 require "trompie"
 Trompie.log_basedir
