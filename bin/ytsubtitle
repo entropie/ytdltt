@@ -53,7 +53,7 @@ module YTDLTT
     else
       Dir.chdir("/tmp") do
         Open3.popen2e(*wrapper.raw_command) do |stdin, stdout_and_err, wait_thr|
-          out.each_line { |line| stdout << line; puts line if $debug }
+          stdout_and_err.each_line { |line| stdout << line; puts line if $debug }
           raise "yt-dlp failed" unless wait_thr.value.success?
         end
       end
