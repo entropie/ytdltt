@@ -3,12 +3,9 @@ require "fileutils"
 require "open3"
 require "thread"
 
-if File.exist?("/home/mit/Source/trompie")
-  selected_path = "/home/mit/Source/trompie/lib"
-  $LOAD_PATH.unshift(selected_path)
-end
-
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../../vendor/trompie/lib")
 require "trompie"
+
 Trompie.log_basedir
 
 $stdout.sync = true
