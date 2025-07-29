@@ -42,12 +42,12 @@ module YTDLTT
 
     # entrypoint
     def YTDLWrapper.[](inputdata, config: DEFAULTS)
-      ret = Downloader.new(select_from_datasat(inputdata.extend(Dataset).nrmlz, config))
+      ret = Downloader.new(select_from_dataset(inputdata.extend(Dataset).nrmlz, config))
       ret
     end
 
     # get handler class from input hash
-    def self.select_from_datasat(inputdata, config)
+    def self.select_from_dataset(inputdata, config)
       data = inputdata.dup
       url = data.delete(:url)
 
