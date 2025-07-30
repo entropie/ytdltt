@@ -1,6 +1,3 @@
 [submodule "vendor/trompie"]
 	path = vendor/trompie
 	url = https://github.com/entropie/trompie
-[submodule "vendor/semaphore"]
-	path = vendor/semaphore
-	url = https://github.com/NOX73/semaphore
