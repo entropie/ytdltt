@@ -276,7 +276,7 @@ module YTDLTT
     end
 
     def do_reply?
-      return false unless media.data[:senderid] or media.data[:mid]
+      media.data[:senderid] and media.data[:mid] and true
     end
 
     def send_reply(content)
