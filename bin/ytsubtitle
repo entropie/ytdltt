@@ -32,12 +32,7 @@ module YTDLTT
       subtitleopts += ["--sub-lang", "en"]
     end
 
-    unless opts.include?("-P") || opts.include?("--path")
-      subtitleopts += ["-P", "."]
-    end
-
     combined_opts = [*subtitleopts, *opts]
-
 
     ohash = { url: url, parameters: combined_opts }
 
@@ -70,6 +65,6 @@ module YTDLTT
   else
     $stdout = $original_stdout
 
-    $stderr.puts "Usage: %s [--sub-lang en][-P .][... yt-dlp arguments] <yt-url>" % [$0]
+    $stderr.puts "Usage: %s [--sub-lang en][... yt-dlp arguments] <yt-url>" % [$0]
   end
 end
