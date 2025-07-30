@@ -2,6 +2,11 @@
 
 require_relative "../lib/ytdltt"
 
+if ARGV.join.strip == "--debug"
+  YTDLTT.debug = true
+  ARGV.clear
+end
+
 module YTDLTT
 
   if ARGV.size > 0

@@ -16,6 +16,14 @@ module YTDLTT
 
   TOPIC = "yt/dl"
 
+  def self.debug=(bool)
+    @debug = bool
+  end
+
+  def self.debug?
+    @debug
+  end
+  
   class YTDLWrapper
     attr_reader :data
 
@@ -185,10 +193,20 @@ module YTDLTT
       @mqtt ||= MMQTT.new
     end
 
+    def self.mqtt_topic
+      if YTDLTT.debug?
+        "test/" + TOPIC
+      else
+        TOPIC
+      end
+    end
+
     def self.loop!
+      Trompie.debug { Trompie.log "YTDLTT: >>> debugging enabled <<<" } if YTDLTT.debug?
+
       thread!
-      Trompie.debug { Trompie.log "YTDLTT: subscribing #{TOPIC}" }
-      mqtt.subscribe(TOPIC) do |data|
+      Trompie.debug { Trompie.log "YTDLTT: subscribing #{mqtt_topic}" }
+      mqtt.subscribe(mqtt_topic) do |data|
         next if data.respond_to?(:empty?) and data.empty?
         Trompie.debug { Trompie.log "YTDLTT::MQTT queueing incoming message: #{data.inspect}" }
         Downloader.queue << data
@@ -205,7 +223,7 @@ module YTDLTT
             Trompie.debug { Trompie.log "YTDLTT: %s: %s" % [ytdlwr.media.class, ytdlwr.media.url] }
 
             ret, filename = ytdlwr.download
-            if Wormhole.available?
+            if ytdlwr.do_reply? and Wormhole.available?
               Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
             end
 
@@ -257,9 +275,14 @@ module YTDLTT
       [true, filename]
     end
 
+    def do_reply?
+      return false unless media.data[:senderid] or media.data[:mid]
+    end
+
     def send_reply(content)
       topic = "telegram/message"
       chatid, message_id = media.data[:senderid], media.data[:mid]
+      return false unless chatid or message_id
       rep = { type: :message, 
               chatId: chatid,
               content: content,
