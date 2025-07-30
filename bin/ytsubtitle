@@ -70,6 +70,6 @@ module YTDLTT
   else
     $stdout = $original_stdout
 
-    $stderr.puts "Usage: %s [--sub-lang en][-P <path>][... yt-dlp arguments] <yt-url>" % [$0]
+    $stderr.puts "Usage: %s [--sub-lang en][-P .][... yt-dlp arguments] <yt-url>" % [$0]
   end
 end
