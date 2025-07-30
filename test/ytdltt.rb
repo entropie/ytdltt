@@ -41,3 +41,22 @@ class TestParameters < Minitest::Test
   end
 
 end
+
+
+class TestDataset < Minitest::Test
+  include Input
+  def setup
+    @input = Input::INPUTS.first.dup
+    @wrapper = YTDLTT::YTDLWrapper[@input]
+  end
+
+  def test_if_class_is_video
+    assert_instance_of YTDLTT::Video, YTDLTT::YTDLWrapper.select_from_dataset(@input, {  })
+  end
+
+  def test_if_class_is_audio
+    @input[:url] = "A---%s" % @input[:url]
+    assert_instance_of YTDLTT::Audio, YTDLTT::YTDLWrapper.select_from_dataset(@input, {  })
+  end
+
+end
