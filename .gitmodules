@@ -1,3 +1,4 @@
 [submodule "vendor/trompie"]
 	path = vendor/trompie
 	url = https://github.com/entropie/trompie
+	branch = main
