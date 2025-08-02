@@ -205,7 +205,7 @@ module YTDLTT
       Trompie.debug { Trompie.log "YTDLTT: >>> debugging enabled <<<" } if YTDLTT.debug?
 
       thread!
-      Trompie.debug { Trompie.log "YTDLTT: subscribing #{mqtt_topic}" }
+      Trompie.info { Trompie.log "YTDLTT: subscribing #{mqtt_topic}" }
       mqtt.subscribe(mqtt_topic) do |data|
         next if data.respond_to?(:empty?) and data.empty?
         Trompie.debug { Trompie.log "YTDLTT::MQTT queueing incoming message: #{data.inspect}" }
@@ -228,7 +228,7 @@ module YTDLTT
             end
 
           rescue => e
-            Trompie.debug{ Trompie.log "YTDLTT: Download failed: #{e.class} - #{e.message}" } 
+            Trompie.info{ Trompie.log "YTDLTT: Download failed: #{e.class} - #{e.message}" }
           end
         end
       end
@@ -259,13 +259,13 @@ module YTDLTT
     def run_download_command!
       filename = nil
 
-      Trompie.debug { log "YTDLTT::Command: '%s'" %  command.join(" ")}
+      Trompie.info { log "YTDLTT::Command: '%s'" %  command.join(" ")}
 
       Open3.popen2e(*command) do |stdin, stdout_and_err, wait_thr|
         stdout_and_err.each_line do |line|
           filename = line.strip
         end
-        Trompie.debug { log "YTDLTT::Download finished #{filename}" }
+        Trompie.info { log "YTDLTT::Download finished #{filename}" }
 
         exit_status = wait_thr.value
         unless exit_status.success?
