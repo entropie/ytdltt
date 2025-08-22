@@ -95,8 +95,7 @@ module YTDLTT
     def ytdlp_default_arguments(*args)
       [ '-o', title_template, '--restrict-filenames', '--print', 'after_move:filepath',
         '--fragment-retries', "3", "--retries", "3",
-        '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments',
-        '--xff', 'default'
+        '--no-playlist', '--no-post-overwrites', '--no-mtime', '--no-write-comments'
       ] + args
     end
 
@@ -148,7 +147,7 @@ module YTDLTT
 
   class Audio < YTDLWrapper
     def ytdlp_default_arguments
-      super '-f bestaudio', '--extract-audio', '--audio-format mp3', '--audio-quality 0'
+      super '-x', '--audio-format mp3', '--audio-quality 0', '--no-abort-on-error', '--ignore-errors'
     end
 
     def target_directory
