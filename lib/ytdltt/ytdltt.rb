@@ -266,9 +266,11 @@ module YTDLTT
         stdout_and_err.each_line do |line|
           filename = line.strip
         end
-        Trompie.info { log "YTDLTT::Download finished #{filename}" }
 
         exit_status = wait_thr.value
+
+        Trompie.debug { log "YTDLTT::Download finished Exitcode:#{exit_status} -- #{filename}" }
+
         unless exit_status.success?
           return [false, filename]
         end
