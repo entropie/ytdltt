@@ -234,7 +234,7 @@ module YTDLTT
               end
             end
 
-            sleep_seconds = rand(200..8*60)
+            sleep_seconds = rand(8*60..15*60)
             Trompie.debug { Trompie.log("YTDLTT::SLEEP %s Minutes" % [sleep_seconds/60]) }
             sleep sleep_seconds
 
