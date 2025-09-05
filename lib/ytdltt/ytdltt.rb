@@ -16,8 +16,10 @@ module YTDLTT
 
   TOPIC = "yt/dl"
 
+  ERRORFILE = "/home/mit/.ytdltt-fails.log"
+
   def self.debug=(bool)
-    @debug = bool
+    $debug = @debug = bool
   end
 
   def self.debug?
@@ -224,9 +226,17 @@ module YTDLTT
             Trompie.debug { Trompie.log "YTDLTT: %s: %s" % [ytdlwr.media.class, ytdlwr.media.url] }
 
             ret, filename = ytdlwr.download
-            if ytdlwr.do_reply? and Wormhole.available?
-              Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
+            if ytdlwr.do_reply?
+              if !ret
+                handle_fail(ytdlwr)
+              elsif Wormhole.available?
+                Wormhole.ytdltt_block.call(filename, ytdlwr, WORMHOLE_TIMEOUT)
+              end
             end
+
+            sleep_seconds = rand(200..8*60)
+            Trompie.debug { Trompie.log("YTDLTT::SLEEP %s Minutes" % [sleep_seconds/60]) }
+            sleep sleep_seconds
 
           rescue => e
             Trompie.info{ Trompie.log "YTDLTT: Download failed: #{e.class} - #{e.message}" }
@@ -235,6 +245,14 @@ module YTDLTT
       end
     end
 
+    def self.handle_fail(wrapper)
+      wrapper.send_reply("!!! #{wrapper.media.url}")
+      Trompie.info{ Trompie.log "YTDLTT::FAIL #{wrapper.media.url}" }
+      if ERRORFILE
+        File.open(ERRORFILE, "a"){ |fp| fp.puts(wrapper.media.url) }
+      end
+      true
+    end
 
     def raw_command
       [bin, @media.data[:parameters], @media.url].flatten
@@ -268,10 +286,10 @@ module YTDLTT
         end
 
         exit_status = wait_thr.value
+        is_real_file = File.exist?(filename)
+        Trompie.info { log "YTDLTT::Download(Success:#{exit_status.success?},FileExist:#{is_real_file}) -- #{filename}" }
 
-        Trompie.debug { log "YTDLTT::Download finished Exitcode:#{exit_status} -- #{filename}" }
-
-        unless exit_status.success?
+        if not exit_status.success? or not is_real_file
           return [false, filename]
         end
       end
