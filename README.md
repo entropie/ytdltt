@@ -51,26 +51,32 @@ It should work well with node-red and telegram:
 }
 ```
 
-### Example ytdltt.servie for systemd
+### Nix systemd service defintion, should be easy to adapt
 
-placed in `~/.config/systemd/user/ytdltt.service`, edit to your needs
+    systemd.services.ytdltt = {
+      description = "Run ytdltt Ruby script";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+  
+      serviceConfig = {
+        Type = "simple";
+        User = "mit";
+        ExecStart = "${pkgs.ruby_3_2}/bin/ruby /etc/nixos/res/gems/ytdltt/bin/ytdltt";
+        WorkingDirectory = "/etc/nixos/res/gems/ytdltt";
+  
+        Environment = [
+          "PATH=${lib.makeBinPath [
+            pkgs.ruby_3_2
+            pkgs.ffmpeg
+            pkgs.yt-dlp
+          ]}:/etc/profiles/ruby-gems/bin"
+        ];
+  
+        Restart = "on-failure";
+        RestartSec = "60s";
+        StartLimitBurst = 5;
+      };
+    };
 
 
-    Θ cat ~/.config/systemd/user/ytdltt.service
-    [Unit]
-    Description=Run ytdltt Ruby script (user)
-    After=network.target
 
-    [Service]
-    Type=simple
-    ExecStart=/run/current-system/sw/bin/ruby /etc/nixos/res/gems/ytdltt/bin/ytdltt
-    WorkingDirectory=/etc/nixos/res/gems/ytdltt
-    Environment=PATH=/run/current-system/sw/bin:/etc/nixos/res/gems/bin
-    RestartSec=30s
-    StartLimitBurst=5
-
-
-    Restart=on-failure
-
-    [Install]
-    WantedBy=default.target
