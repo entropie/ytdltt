@@ -23,16 +23,21 @@ It should work well with node-red and telegram:
 * node-red watches telegram bot for incoming message (a youtuble url,
   maybe prefixed)
 * check in node if sender is authorized
-* optionally we may apply params, depending on senderID
+* optionally we may apply params, depending on senderID; eg: when my Mother is sending an URL i chose
 * submits hash to `yt/dl'
+* which is processed by `ytdltt`
 * ytdltt sends wormhole code if applicable via `message/telegram'
+
+#### Example node-red function node
+
+![example](res/img/node-red-function-node-example.png)
 
 
 ### Requirements
 
 - `yt-dlp` and `ffmpeg` in `$PATH`
 - MQTT broker
-- Ruby with [`Trompie`](https://github.com/entropie/trompie)
+- Ruby with [`Trompie`](https://github.com/entropie/trompie) which enables seamless communication with mqtt broker
 - Optional: `magic-wormhole`
 
 ### Example MQTT Payload
@@ -51,7 +56,7 @@ It should work well with node-red and telegram:
 }
 ```
 
-### Nix systemd service defintion, should be easy to adapt
+### Nix systemd service definition, should be easy to adapt
 
     systemd.services.ytdltt = {
       description = "Run ytdltt Ruby script";
