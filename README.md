@@ -23,7 +23,7 @@ It should work well with node-red and telegram:
 * node-red watches telegram bot for incoming message (a youtuble url,
   maybe prefixed)
 * check in node if sender is authorized
-* optionally we may apply params, depending on senderID; eg: when my Mother is sending an URL i chose
+* optionally we may apply params, depending on senderID
 * submits hash to `yt/dl'
 * which is processed by `ytdltt`
 * `ytdltt` sends wormhole code if applicable via `message/telegram' (which is further handled by node red)
