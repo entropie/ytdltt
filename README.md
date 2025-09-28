@@ -24,9 +24,9 @@ It should work well with node-red and telegram:
   maybe prefixed)
 * check in node if sender is authorized
 * optionally we may apply params, depending on senderID
-* submits hash to `yt/dl'
+* submits hash to `yt/dl` topic
 * which is processed by `ytdltt`
-* `ytdltt` sends wormhole code if applicable via `message/telegram' (which is further handled by node red)
+* `ytdltt` sends wormhole code if applicable via `message/telegram` (which is further handled by node red)
 
 #### Example node-red function node
 
