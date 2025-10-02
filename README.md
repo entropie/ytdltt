@@ -74,7 +74,9 @@ It should work well with node-red and telegram:
             pkgs.ruby_3_2
             pkgs.ffmpeg
             pkgs.yt-dlp
+            pkgs.magic-wormhole
           ]}:/etc/profiles/ruby-gems/bin"
+          "YTDLTT_SLEEP=1"
         ];
   
         Restart = "on-failure";
