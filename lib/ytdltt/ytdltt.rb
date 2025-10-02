@@ -211,7 +211,7 @@ module YTDLTT
       Trompie.info { Trompie.log "YTDLTT: subscribing #{mqtt_topic}" }
       mqtt.subscribe(mqtt_topic) do |data|
         next if data.respond_to?(:empty?) and data.empty?
-        Trompie.debug { Trompie.log "YTDLTT::MQTT queueing incoming message: #{data.inspect}" }
+        Trompie.info { Trompie.log "YTDLTT::MQTT queueing incoming message: #{data.inspect}" }
         Downloader.queue << data
       end
     end
@@ -234,9 +234,12 @@ module YTDLTT
               end
             end
 
-            sleep_seconds = rand(8*60..15*60)
-            Trompie.debug { Trompie.log("YTDLTT::SLEEP %s Minutes" % [sleep_seconds/60]) }
-            sleep sleep_seconds
+            if ENV["YTDLTT_SLEEP"]
+              sleep_seconds = rand(8*60..15*60)
+
+              Trompie.info { Trompie.log("YTDLTT::SLEEP %s Minutes" % [sleep_seconds/60]) }
+              sleep sleep_seconds
+            end
 
           rescue => e
             Trompie.info{ Trompie.log "YTDLTT: Download failed: #{e.class} - #{e.message}" }
