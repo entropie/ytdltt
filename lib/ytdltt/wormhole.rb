@@ -4,8 +4,10 @@ module Wormhole
 
   class TransferComplete < RuntimeError; end
 
-  def self.available?
-    system("which wormhole > /dev/null 2>&1")
+  def self.available?(command = "wormhole")
+    ENV['PATH'].split(File::PATH_SEPARATOR).any? do |path|
+      File.executable?(File.join(path, command))
+    end
   end
 
   def self.ytdltt_block
