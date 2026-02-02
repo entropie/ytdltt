@@ -6,6 +6,13 @@ require "thread"
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../../vendor/trompie/lib")
 require "trompie"
 
+venv = File.join(ENV["HOME"], ".yt-dlp-venv", "bin")
+ENV["PATH"] = "#{venv}:#{ENV["PATH"]}"
+
+HOST_INFO = [`which yt-dlp`, `yt-dlp --version`].map(&:strip)
+
+Trompie.log "YTDLTT::yt-dlp: #{HOST_INFO.first} --version '#{HOST_INFO.last}'"
+
 Trompie.log_basedir
 
 $stdout.sync = true
