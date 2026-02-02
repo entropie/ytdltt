@@ -23,7 +23,7 @@ module YTDLTT
 
   TOPIC = "yt/dl"
 
-  ERRORFILE = "/home/mit/.ytdltt-fails.log"
+  ERRORFILE = File.expand_path("~/.ytdltt-fails.log")
 
   def self.debug=(bool)
     $debug = @debug = bool
