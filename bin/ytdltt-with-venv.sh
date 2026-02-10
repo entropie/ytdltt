@@ -8,7 +8,7 @@ if [ ! -x "$VENV/bin/yt-dlp" ]; then
 fi
 source "$VENV/bin/activate"
 
-"$VENV/bin/pip" install -U pip yt-dlp >/dev/null 2>&1 || true
+"$VENV/bin/pip" install -U pip yt-dlp
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 exec ruby "$SCRIPT_DIR/ytdltt" "$@"
