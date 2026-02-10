@@ -11,7 +11,11 @@ ENV["PATH"] = "#{venv}:#{ENV["PATH"]}"
 
 HOST_INFO = [`which yt-dlp`, `yt-dlp --version`].map(&:strip) rescue nil
 
-Trompie.log "YTDLTT::yt-dlp: #{HOST_INFO.first} --version '#{HOST_INFO.last}'"
+if HOST_INFO
+  Trompie.log "YTDLTT::yt-dlp: #{HOST_INFO.first} --version '#{HOST_INFO.last}'"
+else
+  Trompie.log "YTDLTT::yt-dlp: no hostinfo gathered"
+end
 
 Trompie.log_basedir
 
