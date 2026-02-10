@@ -9,7 +9,7 @@ require "trompie"
 venv = File.join(ENV["HOME"], ".yt-dlp-venv", "bin")
 ENV["PATH"] = "#{venv}:#{ENV["PATH"]}"
 
-HOST_INFO = [`which yt-dlp`, `yt-dlp --version`].map(&:strip)
+HOST_INFO = [`which yt-dlp`, `yt-dlp --version`].map(&:strip) rescue nil
 
 Trompie.log "YTDLTT::yt-dlp: #{HOST_INFO.first} --version '#{HOST_INFO.last}'"
 
