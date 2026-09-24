@@ -170,7 +170,8 @@ module YTDLTT
 
   class Video < YTDLWrapper
     def ytdlp_default_arguments
-      super '-f bestvideo+bestaudio/best', '--merge-output-format mp4'
+      super '-f bestvideo[vcodec!^=av01]+bestaudio[acodec^=mp4a]/bestvideo+bestaudio/best',
+            '--merge-output-format mp4'
     end
     
     def target_directory
